@@ -24,7 +24,7 @@ class LoggerGUI(tk.Frame):
         self.createLabeledProgressBar()
         self.addStateButtons()
         self.addExitButton()
-        self.addMicroseconsViewButton()
+        self.addMenuButton()
 
     def setStyle(self):
         self.configureWindow()
@@ -77,9 +77,9 @@ class LoggerGUI(tk.Frame):
                 microseconds = "0" + str(microseconds)
                 if len(microseconds) < 3:
                     microseconds = "0" + microseconds
-            return f"{hours}:{minutes}:{seconds}.{microseconds}   "
+            return f"{hours}:{minutes}:{seconds}.{microseconds}       "
         else:
-            return f"{hours}:{minutes}:{seconds}   "
+            return f"{hours}:{minutes}:{seconds}       "
 
     def addStateButtons(self):
         listOfButtons = json.load(open("icons/description"))
@@ -129,27 +129,37 @@ class LoggerGUI(tk.Frame):
         self.logger.setState("stop")
         self.master.destroy()
 
-    def addMicroseconsViewButton(self):
+
+    def addMenuButton(self):
+        self.createMenu()
         image = tk.PhotoImage(file="icons/rat.ppm",
                               width=self.itemWidth,
                               height=self.itemHeight)
         self.images.append(image)
-        self.microsecondsOn = True
-        self.but = tk.Button(self,
-                             command=self.withMicroseconds,
-                             highlightthickness=0,
-                             border=0,
-                             image=image,
-                             width=self.itemWidth,
-                             height=self.itemHeight,
-                             )
-        CreateToolTip(self.but, "change time view")
-        self.but.grid(row=int(self.numButtons / self.buttonsInRow) + 1,
-                      column=self.numButtons % self.buttonsInRow,
-                      columnspan=1)
+        self.menuButton = tk.Button(self,
+                              command=self.showMenu,
+                              highlightthickness=0,
+                              border=0,
+                              image=image,
+                              width=self.itemWidth,
+                              height=self.itemHeight,
+                              )
+        CreateToolTip(self.menuButton, "menu")
+        self.menuButton.grid(row=int(self.numButtons / self.buttonsInRow) + 1,
+                       column=self.numButtons % self.buttonsInRow,
+                       columnspan=1)
         self.numButtons += 1
 
-    def withMicroseconds(self):
+    def createMenu(self):
+        self.menu = tk.Menu(tearoff=0)
+        self.microsecondsOn = False
+        self.menu.add_command(label="Switch microseconds view", command=self.onOffMicroseconds)
+
+    def showMenu(self):
+        self.menu.post(self.menuButton.winfo_rootx() + self.menuButton.winfo_width(),
+                       self.menuButton.winfo_rooty() + self.menuButton.winfo_height())
+
+    def onOffMicroseconds(self):
         self.microsecondsOn = not self.microsecondsOn
 
 
